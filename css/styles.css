@@ -60,7 +60,7 @@ canvas {
     transition: opacity 0.25s ease;
 }
 
-/* ✨ Opcional: Glow extra cuando es visible */
+/* Glow extra cuando es visible */
 #sphere-text.visible {
     text-shadow: 
         0 0 10px #aaddff,
