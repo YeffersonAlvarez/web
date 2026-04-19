@@ -13,7 +13,7 @@ let textElement, lastMove = 0, textIndex = 0;
 let lastTextChange = 0;
 
 function init() {
-    console.log('🚀 Iniciando escena...');
+    console.log(' Iniciando escena...');
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
@@ -29,7 +29,7 @@ function init() {
     renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild(renderer.domElement);
     
-    console.log('✅ Renderer creado');
+    console.log(' Renderer creado');
 
     // Luces
     scene.add(new THREE.AmbientLight(0xffffff, 0.2));
@@ -40,7 +40,7 @@ function init() {
     rimLight.position.set(-4, 2, -5);
     scene.add(rimLight);
     
-    console.log('✅ Luces añadidas');
+    console.log(' Luces añadidas');
 
     const loader = new THREE.TextureLoader();
     let loadedCount = 0;
@@ -48,22 +48,22 @@ function init() {
 
     function checkReady() {
         loadedCount++;
-        console.log(`📦 Carga ${loadedCount}/${totalToLoad} completada`);
+        console.log(` Carga ${loadedCount}/${totalToLoad} completada`);
         if (loadedCount >= totalToLoad) {
             const el = document.getElementById('loading');
             if (el) {
                 el.style.opacity = 0;
-                console.log('✅ Escena lista - Loader oculto');
+                console.log(' Escena lista - Loader oculto');
             }
         }
     }
 
     // FONDO
-    console.log('📥 Cargando fondo:', BG_IMAGE);
+    console.log(' Cargando fondo:', BG_IMAGE);
     loader.load(
         BG_IMAGE,
         (texture) => {
-            console.log('✅ Fondo cargado');
+            console.log(' Fondo cargado');
             bgTexture = texture;
             texture.encoding = THREE.sRGBEncoding;
             
@@ -87,8 +87,8 @@ function init() {
         },
         undefined,
         (error) => {
-            console.error('❌ ERROR cargando fondo:', error);
-            console.error('📁 Ruta intentada:', BG_IMAGE);
+            console.error(' ERROR cargando fondo:', error);
+            console.error(' Ruta intentada:', BG_IMAGE);
             // Crear fondo de color si la imagen falla
             scene.background = new THREE.Color(0x0a0a1a);
             checkReady();
@@ -96,19 +96,19 @@ function init() {
     );
 
     // ESFERA
-    console.log('📥 Cargando esfera:', SPHERE_IMAGE);
+    console.log(' Cargando esfera:', SPHERE_IMAGE);
     loader.load(
         SPHERE_IMAGE,
         (texture) => {
-            console.log('✅ Esfera cargada');
+            console.log(' Esfera cargada');
             texture.encoding = THREE.sRGBEncoding;
             createSphere(texture);
             checkReady();
         },
         undefined,
         (error) => {
-            console.error('❌ ERROR cargando esfera:', error);
-            console.error('📁 Ruta intentada:', SPHERE_IMAGE);
+            console.error(' ERROR cargando esfera:', error);
+            console.error(' Ruta intentada:', SPHERE_IMAGE);
             // Crear esfera de respaldo
             createSphere(null);
             checkReady();
@@ -116,15 +116,15 @@ function init() {
     );
 
     textElement = document.getElementById('sphere-text');
-    console.log('🔤 Elemento texto:', textElement ? '✅ Encontrado' : '❌ No encontrado');
+    console.log(' Elemento texto:', textElement ? ' Encontrado' : ' No encontrado');
     
     createParticles();
-    console.log('❄️ Partículas creadas');
+    console.log(' Partículas creadas');
 
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onResize);
     
-    console.log('🎬 Iniciando animación...');
+    console.log(' Iniciando animación...');
     animate();
 }
 
@@ -162,7 +162,7 @@ function createSphere(texture) {
     sphereMat = new THREE.MeshPhysicalMaterial(matConfig);
     sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
     scene.add(sphereMesh);
-    console.log('⚫ Esfera creada en escena');
+    console.log(' Esfera creada en escena');
 }
 
 function createParticles() {
