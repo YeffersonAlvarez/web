@@ -12,6 +12,9 @@ let particles, particlesGeometry, particlesMaterial;
 let textElement, lastMove = 0, textIndex = 0;
 let lastTextChange = 0;
 
+//  Para detectar clicks 
+let raycaster, mouseClick;
+
 function init() {
     // 1. Escena
     scene = new THREE.Scene();
@@ -42,71 +45,80 @@ function init() {
     // 5. Cargar Texturas
     const loader = new THREE.TextureLoader();
 
-    // FONDO: Cargar con cálculo matemático para móvil/PC
-    loader.load(
-        BG_IMAGE,
-        (texture) => {
-            bgTexture = texture;
-            texture.encoding = THREE.sRGBEncoding;
-            updateBackgroundSize();
-            
-            const mat = new THREE.MeshBasicMaterial({ 
-                map: texture, 
-                transparent: true, 
-                opacity: 0.7 
-            });
-            bgMesh = new THREE.Mesh(bgGeo, mat);
-            bgMesh.position.z = -12;
-            scene.add(bgMesh);
-        },
-        undefined,
-        (error) => {
-            console.error('ERROR cargando fondo:', error);
-            scene.background = new THREE.Color(0x0a0a1a);
-        }
-    );
+    // FONDO
+    loader.load(BG_IMAGE, (texture) => {
+        bgTexture = texture;
+        texture.encoding = THREE.sRGBEncoding;
+        updateBackgroundSize();
+        const mat = new THREE.MeshBasicMaterial({ 
+            map: texture, transparent: true, opacity: 0.7 
+        });
+        bgMesh = new THREE.Mesh(bgGeo, mat);
+        bgMesh.position.z = -12;
+        scene.add(bgMesh);
+    });
 
     // ESFERA
-    loader.load(
-        SPHERE_IMAGE,
-        (texture) => {
-            texture.encoding = THREE.sRGBEncoding;
-            createSphere(texture);
-        },
-        undefined,
-        (error) => {
-            console.error('ERROR cargando esfera:', error);
-            createSphere(null);
-        }
-    );
+    loader.load(SPHERE_IMAGE, (texture) => {
+        createSphere(texture);
+    }, undefined, () => { createSphere(null); });
 
     // Texto y partículas
     textElement = document.getElementById('sphere-text');
     createParticles();
 
+    // Inicializar raycaster para detectar clicks
+    raycaster = new THREE.Raycaster();
+    mouseClick = new THREE.Vector2();
+
     // Eventos
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onResize);
+
+    // AGREGAR: Evento de click para cambiar texto
+    window.addEventListener('click', onClick);
     
     animate();
 }
 
-// --- TEXTO: Solo cambia si el mouse está SOBRE la esfera ---
+// ---  MOUSEMOVE: Solo muestra el texto (NO lo cambia) ---
 function onMouseMove(e) {
     mouseX = (e.clientX / window.innerWidth) * 2 - 1;
     mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
     lastMove = Date.now();
     
-    if (textElement) textElement.style.opacity = '1';
+    // Solo mostrar texto, sin cambiarlo
+    if (textElement) {
+        textElement.style.opacity = '1';
+    }
+}
+
+// ---  CLICK: Cambia el texto SOLO si se hace click en la esfera ---
+function onClick(event) {
+    // Calcular posición del mouse en coordenadas normalizadas
+    mouseClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouseClick.y = -(event.clientY / window.innerHeight) * 2 + 1;
     
+    // Actualizar raycaster
+    raycaster.setFromCamera(mouseClick, camera);
+    
+    // Detectar intersección con la esfera
     if (sphereMesh) {
-        const dist = Math.sqrt(mouseX*mouseX + mouseY*mouseY);
-        if (dist < 0.38) {
+        const intersects = raycaster.intersectObject(sphereMesh);
+        
+        // Si hay intersección (click en la esfera)
+        if (intersects.length > 0) {
             const now = Date.now();
-            if (now - lastTextChange > 400) {
+            // Evitar cambios muy rápidos (cooldown de 300ms)
+            if (now - lastTextChange > 300) {
                 textIndex = (textIndex + 1) % TEXTS.length;
                 textElement.textContent = TEXTS[textIndex];
                 lastTextChange = now;
+                
+                // Mostrar texto si estaba oculto
+                if (textElement) {
+                    textElement.style.opacity = '1';
+                }
             }
         }
     }
@@ -166,19 +178,12 @@ function createParticleTexture() {
 // --- FONDO: CÁLCULO MATEMÁTICO PARA MÓVIL Y PC ---
 function updateBackgroundSize() {
     if (!bgTexture || !camera) return;
-    
-    // Distancia desde la cámara hasta el plano del fondo (z=7 a z=-12 = 19 unidades)
     const dist = camera.position.z - (-12);
-    
-    // Altura visible del frustum a esa distancia
     const vFovRad = THREE.MathUtils.degToRad(camera.fov);
     const visibleHeight = 2 * Math.tan(vFovRad / 2) * dist;
     const visibleWidth = visibleHeight * camera.aspect;
-    
-    // Agregamos 15% de margen para efecto "cover" seguro en cualquier orientación
     const planeW = visibleWidth * 1.15;
     const planeH = visibleHeight * 1.15;
-    
     if (bgGeo) bgGeo.dispose();
     bgGeo = new THREE.PlaneGeometry(planeW, planeH);
     if (bgMesh) bgMesh.geometry = bgGeo;
@@ -189,10 +194,7 @@ function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight, false);
-    
-    // Recalcular fondo con la función corregida
     updateBackgroundSize();
-    
     if (bgMesh) bgMesh.geometry = bgGeo;
 }
 
