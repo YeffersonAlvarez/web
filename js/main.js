@@ -13,8 +13,6 @@ let textElement, lastMove = 0, textIndex = 0;
 let lastTextChange = 0;
 
 function init() {
-    console.log('Iniciando escena...');
-    
     // 1. Escena
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
@@ -31,8 +29,6 @@ function init() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild(renderer.domElement);
-    
-    console.log('Renderer creado');
 
     // 4. Luces
     scene.add(new THREE.AmbientLight(0xffffff, 0.2));
@@ -42,35 +38,16 @@ function init() {
     const rimLight = new THREE.PointLight(0x4466ff, 1.2, 20);
     rimLight.position.set(-4, 2, -5);
     scene.add(rimLight);
-    console.log('Luces añadidas');
 
     // 5. Cargar Texturas
     const loader = new THREE.TextureLoader();
-    let loadedCount = 0;
-    let totalToLoad = 2;
-
-    function checkReady() {
-        loadedCount++;
-        console.log('Carga ' + loadedCount + '/' + totalToLoad + ' completada');
-        if (loadedCount >= totalToLoad) {
-            const el = document.getElementById('loading');
-            if (el) {
-                el.style.opacity = 0;
-                console.log('Escena lista - Loader oculto');
-            }
-        }
-    }
 
     // FONDO: Cargar con cálculo matemático para móvil/PC
-    console.log('Cargando fondo:', BG_IMAGE);
     loader.load(
         BG_IMAGE,
         (texture) => {
-            console.log('Fondo cargado');
             bgTexture = texture;
             texture.encoding = THREE.sRGBEncoding;
-            
-            // CÁLCULO MATEMÁTICO PARA COBERTURA TOTAL
             updateBackgroundSize();
             
             const mat = new THREE.MeshBasicMaterial({ 
@@ -81,49 +58,36 @@ function init() {
             bgMesh = new THREE.Mesh(bgGeo, mat);
             bgMesh.position.z = -12;
             scene.add(bgMesh);
-            
-            checkReady();
         },
         undefined,
         (error) => {
             console.error('ERROR cargando fondo:', error);
-            console.error('Ruta intentada:', BG_IMAGE);
             scene.background = new THREE.Color(0x0a0a1a);
-            checkReady();
         }
     );
 
     // ESFERA
-    console.log('Cargando esfera:', SPHERE_IMAGE);
     loader.load(
         SPHERE_IMAGE,
         (texture) => {
-            console.log('Esfera cargada');
             texture.encoding = THREE.sRGBEncoding;
             createSphere(texture);
-            checkReady();
         },
         undefined,
         (error) => {
             console.error('ERROR cargando esfera:', error);
-            console.error('Ruta intentada:', SPHERE_IMAGE);
             createSphere(null);
-            checkReady();
         }
     );
 
     // Texto y partículas
     textElement = document.getElementById('sphere-text');
-    console.log('Elemento texto:', textElement ? 'Encontrado' : 'No encontrado');
-    
     createParticles();
-    console.log('Partículas creadas');
 
     // Eventos
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onResize);
     
-    console.log('Iniciando animación...');
     animate();
 }
 
@@ -163,7 +127,6 @@ function createSphere(texture) {
     sphereMat = new THREE.MeshPhysicalMaterial(matConfig);
     sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
     scene.add(sphereMesh);
-    console.log('Esfera creada en escena');
 }
 
 // --- PARTÍCULAS ---
