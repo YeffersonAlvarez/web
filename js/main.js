@@ -63,19 +63,15 @@ function init() {
         createSphere(texture);
     }, undefined, () => { createSphere(null); });
 
-    // Texto y partículas
     textElement = document.getElementById('sphere-text');
     createParticles();
 
-    // Inicializar raycaster para detectar clicks
     raycaster = new THREE.Raycaster();
     mouseClick = new THREE.Vector2();
 
-    // Eventos
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onResize);
 
-    // AGREGAR: Evento de click para cambiar texto
     window.addEventListener('click', onClick);
     
     animate();
@@ -87,7 +83,6 @@ function onMouseMove(e) {
     mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
     lastMove = Date.now();
     
-    // Solo mostrar texto, sin cambiarlo
     if (textElement) {
         textElement.style.opacity = '1';
     }
@@ -95,27 +90,23 @@ function onMouseMove(e) {
 
 
 function onClick(event) {
-    // Calcular posición del mouse en coordenadas normalizadas
     mouseClick.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouseClick.y = -(event.clientY / window.innerHeight) * 2 + 1;
     
-    // Actualizar raycaster
+
     raycaster.setFromCamera(mouseClick, camera);
     
     
     if (sphereMesh) {
         const intersects = raycaster.intersectObject(sphereMesh);
         
-        // Si hay intersección (click en la esfera)
         if (intersects.length > 0) {
             const now = Date.now();
-            // Evitar cambios muy rápidos (cooldown de 300ms)
             if (now - lastTextChange > 300) {
                 textIndex = (textIndex + 1) % TEXTS.length;
                 textElement.textContent = TEXTS[textIndex];
                 lastTextChange = now;
                 
-                // Mostrar texto si estaba oculto
                 if (textElement) {
                     textElement.style.opacity = '1';
                 }
