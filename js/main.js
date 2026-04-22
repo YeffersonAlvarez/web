@@ -12,11 +12,11 @@ let particles, particlesGeometry, particlesMaterial;
 let textElement, lastMove = 0, textIndex = 0;
 let lastTextChange = 0;
 
-//  Para detectar clicks 
+
 let raycaster, mouseClick;
 
 function init() {
-    // 1. Escena
+    
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     scene.fog = new THREE.FogExp2(0x000000, 0.03);
@@ -25,7 +25,7 @@ function init() {
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 7;
 
-    // 3. Renderizador
+    
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.domElement.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;height:100%;outline:none;z-index:0;';
     renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -33,7 +33,7 @@ function init() {
     renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild(renderer.domElement);
 
-    // 4. Luces
+    
     scene.add(new THREE.AmbientLight(0xffffff, 0.2));
     const mainLight = new THREE.DirectionalLight(0xffffff, 1.8);
     mainLight.position.set(4, 5, 4);
@@ -42,10 +42,10 @@ function init() {
     rimLight.position.set(-4, 2, -5);
     scene.add(rimLight);
 
-    // 5. Cargar Texturas
+    
     const loader = new THREE.TextureLoader();
 
-    // FONDO
+    
     loader.load(BG_IMAGE, (texture) => {
         bgTexture = texture;
         texture.encoding = THREE.sRGBEncoding;
@@ -58,7 +58,7 @@ function init() {
         scene.add(bgMesh);
     });
 
-    // ESFERA
+    
     loader.load(SPHERE_IMAGE, (texture) => {
         createSphere(texture);
     }, undefined, () => { createSphere(null); });
@@ -81,7 +81,7 @@ function init() {
     animate();
 }
 
-// ---  MOUSEMOVE: Solo muestra el texto (NO lo cambia) ---
+
 function onMouseMove(e) {
     mouseX = (e.clientX / window.innerWidth) * 2 - 1;
     mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -93,7 +93,7 @@ function onMouseMove(e) {
     }
 }
 
-// ---  CLICK: Cambia el texto SOLO si se hace click en la esfera ---
+
 function onClick(event) {
     // Calcular posición del mouse en coordenadas normalizadas
     mouseClick.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -102,7 +102,7 @@ function onClick(event) {
     // Actualizar raycaster
     raycaster.setFromCamera(mouseClick, camera);
     
-    // Detectar intersección con la esfera
+    
     if (sphereMesh) {
         const intersects = raycaster.intersectObject(sphereMesh);
         
@@ -124,7 +124,7 @@ function onClick(event) {
     }
 }
 
-// --- CREAR ESFERA ---
+
 function createSphere(texture) {
     sphereGeo = new THREE.SphereGeometry(1.2, 72, 72);
     originalPositions = sphereGeo.attributes.position.array.slice();
@@ -141,7 +141,7 @@ function createSphere(texture) {
     scene.add(sphereMesh);
 }
 
-// --- PARTÍCULAS ---
+
 function createParticles() {
     const count = 500;
     particlesGeometry = new THREE.BufferGeometry();
@@ -175,7 +175,7 @@ function createParticleTexture() {
     const t = new THREE.Texture(c); t.needsUpdate = true; return t;
 }
 
-// --- FONDO: CÁLCULO MATEMÁTICO PARA MÓVIL Y PC ---
+
 function updateBackgroundSize() {
     if (!bgTexture || !camera) return;
     const dist = camera.position.z - (-12);
@@ -189,7 +189,7 @@ function updateBackgroundSize() {
     if (bgMesh) bgMesh.geometry = bgGeo;
 }
 
-// --- RESIZE ---
+
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -198,7 +198,7 @@ function onResize() {
     if (bgMesh) bgMesh.geometry = bgGeo;
 }
 
-// --- PARTÍCULAS: Animación ---
+
 function updateParticles() {
     if (!particles) return;
     const pos = particles.geometry.attributes.position.array;
@@ -211,7 +211,7 @@ function updateParticles() {
     particles.geometry.attributes.position.needsUpdate = true;
 }
 
-// --- JELLY DEFORMATION ---
+
 function updateJelly() {
     if (!sphereMesh || !originalPositions) return;
     const pos = sphereGeo.attributes.position;
@@ -228,7 +228,7 @@ function updateJelly() {
     sphereGeo.computeVertexNormals();
 }
 
-// --- LOOP PRINCIPAL ---
+
 function animate() {
     requestAnimationFrame(animate);
     updateParticles();
