@@ -1,7 +1,7 @@
 // --- CONFIGURACIÓN ---
 const BG_IMAGE = './assets/images/bg-city-night.webp';
 const SPHERE_IMAGE = './assets/images/phere-glossy.webp';
-const TEXTS = ['hi', 'hola', 'привет', '你好', 'hallo', 'bonjour', 'ciao', '안녕', 'merhaba', 'olá'];
+const TEXTS = ['hi', 'hola','привет', '你好', 'hallo', 'bonjour', 'ciao', '안녕', 'merhaba', 'olá'];
 
 let scene, camera, renderer;
 let sphereMesh, sphereGeo, sphereMat;
